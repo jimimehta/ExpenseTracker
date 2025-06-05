@@ -5,13 +5,21 @@
 
     <form @submit.prevent="addExpense">
 
-      <input v-model="description" placeholder="Description" required />
+      <input v-model="description" placeholder="Description" required @input="errors.description = ''" />
 
-      <input v-model="amount" type="number" placeholder="Amount" required />
+      <div v-if="errors.description" class="error-message">{{ errors.description }}</div>
 
-      <input v-model="date" type="date" required />
+      <input v-model="amount" type="number" placeholder="Amount" required @input="errors.amount = ''" />
 
-      <select v-model="category" required>
+      <div v-if="errors.amount" class="error-message">{{ errors.amount }}</div>
+
+      <input v-model="date" type="date" required @input="clearDateErrors"/>
+
+      <div v-if="errors.date || errors.dateValid" class="error-message">
+        {{ errors.date || errors.dateValid }}
+      </div>
+
+      <select v-model="category" required @change="errors.category = ''">
         <option value="" disabled>Select Category</option>
         <option value="Groceries">Groceries</option>
         <option value="Utilities">Utilities</option>
@@ -21,11 +29,19 @@
         <option value="Other">Other</option>
       </select>
 
+      <div v-if="errors.category" class="error-message">{{ errors.category }}</div>
+
       <button type="submit">Add</button>
 
     </form>
 
+    <!-- Error message display-->
+    <div v-if="generalError" class="error-message">
+      {{ generalError }}
+    </div>
+
   </div>
+
 
 </template>
 
@@ -38,11 +54,22 @@ export default {
       description: '',
       amount: 0,
       date: '',
-      category: ''
+      category: '',
+      errors: {},
+      generalError: ''
     };
   },
   methods: {
+    clearErrors() {
+      this.errors = {};
+      this.generalError = '';
+    },
+    clearDateErrors() {
+      this.errors.date = '';
+      this.errors.dateValid = '';
+    },
     addExpense() {
+      this.clearErrors();
       const auth = localStorage.getItem('auth');
       axios.post('http://localhost:8080/api/expenses', {
         description: this.description,
@@ -59,8 +86,27 @@ export default {
         this.date = '';
         this.category = '';
       })
-      .catch(error => console.error(error));
+      .catch(error => {
+        if (error.response) {
+          // This Handles validation errors
+          if (error.response.status === 400 && error.response.data.details) {
+            this.errors = error.response.data.details;
+          } else {
+            // This Handles other errors
+            this.generalError = error.response.data.message || 'Error has occurred while saving the expense';
+          }
+        } else {
+          this.generalError = 'Network error! Please try again later!';
+        }
+        console.error(error);
+      });
     }
   }
 };
 </script>
+
+<style scoped>
+.error-message {
+  color: #dc3545;
+}
+</style>
