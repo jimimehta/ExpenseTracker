@@ -10,15 +10,17 @@
       <button @click="logout" class="logout-button">Logout</button>
     </div>
 
-    <div class="card">
-      <h2>Filter Expenses</h2>
+    <div class="card filter-card">
+      <div class="filter-header">
+        <h2>Filter Active Expenses</h2>
+      </div>
       <!-- Filter Controls -->
-      <div class="filters-container">
-        <div class="filters">
-          <div class="filter-item">
-            <label for="category" class="input-label">Category:</label>
-            <select id="category" v-model="filters.category" class="select-input">
-              <option value="" disabled>Select Category</option>
+      <div class="compact-filters-container">
+        <div class="compact-filters">
+          <div class="compact-filter-item">
+            <label for="category" class="compact-label">Category</label>
+            <select id="category" v-model="filters.category" class="compact-input">
+              <option value="" disabled>Select</option>
               <option value="Groceries">Groceries</option>
               <option value="Utilities">Utilities</option>
               <option value="Travel">Travel</option>
@@ -28,40 +30,40 @@
             </select>
           </div>
 
-          <div class="filter-item">
-            <label for="startDate" class="input-label">From:</label>
-            <input type="date" id="startDate" v-model="filters.startDate" class="date-input">
+          <div class="compact-filter-item">
+            <label for="startDate" class="compact-label">From</label>
+            <input type="date" id="startDate" v-model="filters.startDate" class="compact-input">
           </div>
 
-          <div class="filter-item">
-            <label for="endDate" class="input-label">To:</label>
-            <input type="date" id="endDate" v-model="filters.endDate" class="date-input">
+          <div class="compact-filter-item">
+            <label for="endDate" class="compact-label">To</label>
+            <input type="date" id="endDate" v-model="filters.endDate" class="compact-input">
           </div>
 
-          <div class="filter-item">
-            <label for="minAmount" class="input-label">Min Amount:</label>
-            <input type="number" id="minAmount" v-model="filters.minAmount" class="number-input">
+          <div class="compact-filter-item">
+            <label for="minAmount" class="compact-label">Min $</label>
+            <input type="number" id="minAmount" v-model="filters.minAmount" class="compact-input">
           </div>
 
-          <div class="filter-item">
-            <label for="maxAmount" class="input-label">Max Amount:</label>
-            <input type="number" id="maxAmount" v-model="filters.maxAmount" class="number-input">
+          <div class="compact-filter-item">
+            <label for="maxAmount" class="compact-label">Max $</label>
+            <input type="number" id="maxAmount" v-model="filters.maxAmount" class="compact-input">
           </div>
-        </div>
-        
-        <div class="filter-actions">
-          <button @click="applyFilters" class="primary-button">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
-            </svg>
-            Apply Filters
-          </button>
-          <button @click="resetFilters" class="secondary-button">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-            </svg>
-            Reset
-          </button>
+          
+          <div class="compact-filter-actions">
+            <button @click="applyFilters" class="compact-button primary-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="compact-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" />
+              </svg>
+              Apply
+            </button>
+            <button @click="resetFilters" class="compact-button secondary-button">
+              <svg xmlns="http://www.w3.org/2000/svg" class="compact-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+              </svg>
+              Reset
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -87,18 +89,26 @@
           @click="activeTab = 'all'" 
           :class="['tab-button', { active: activeTab === 'all' }]"
         >
-          All Expenses
+          <h3>Active Expenses</h3>
         </button>
         <button 
           @click="activeTab = 'archived'" 
           :class="['tab-button', { active: activeTab === 'archived' }]"
         >
-          Archived Expenses
+          <h3>Active Expenses</h3>
         </button>
       </div>
       
-      <!-- All Expenses Tab -->
+      <!-- Active Expenses Tab -->
       <div v-if="activeTab === 'all'" class="tab-content">
+        <div class="page-size-control">
+          <div class="page-size-selector">
+            <label for="pageSize" class="compact-label">Items per page:</label>
+            <select id="pageSize" v-model="pageSize" class="page-size-select" @change="handlePageSizeChange">
+              <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+            </select>
+          </div>
+        </div>
         <div class="expense-table-container">
           <div class="expense-table-header">
             <div class="header-description">Description</div>
@@ -131,19 +141,29 @@
         </div>
 
         <div class="pagination" v-if="totalPages > 0">
-          <button @click="prevPage" :disabled="currentPage === 0" class="page-button">
-            <span>&larr;</span> Previous
-          </button>
-          <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-          <button @click="nextPage" :disabled="currentPage >= totalPages - 1" class="page-button">
-            Next <span>&rarr;</span>
-          </button>
+          <div class="pagination-center">
+            <button @click="prevPage" :disabled="currentPage === 0" class="page-button">
+              <span>&larr;</span> Previous
+            </button>
+            <span class="page-info">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+            <button @click="nextPage" :disabled="currentPage >= totalPages - 1" class="page-button">
+              Next <span>&rarr;</span>
+            </button>
+          </div>
           <span class="total-info">Total items: {{ totalItems }}</span>
         </div>
       </div>
       
       <!-- Archived Expenses Tab -->
       <div v-if="activeTab === 'archived'" class="tab-content">
+        <div class="page-size-control">
+          <div class="page-size-selector">
+            <label for="archivedPageSize" class="compact-label">Items per page:</label>
+            <select id="archivedPageSize" v-model="archivedPageSize" class="page-size-select" @change="handleArchivedPageSizeChange">
+              <option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
+            </select>
+          </div>
+        </div>
         <div class="expense-table-container">
           <div class="expense-table-header">
             <div class="header-description">Description</div>
@@ -166,13 +186,15 @@
         </div>
         
         <div class="pagination" v-if="archivedTotalPages > 0">
-          <button @click="prevArchivedPage" :disabled="archivedPage === 0" class="page-button">
-            <span>&larr;</span> Previous
-          </button>
-          <span class="page-info">Page {{ archivedPage + 1 }} of {{ archivedTotalPages }}</span>
-          <button @click="nextArchivedPage" :disabled="archivedPage >= archivedTotalPages - 1" class="page-button">
-            Next <span>&rarr;</span>
-          </button>
+          <div class="pagination-center">
+            <button @click="prevArchivedPage" :disabled="archivedPage === 0" class="page-button">
+              <span>&larr;</span> Previous
+            </button>
+            <span class="page-info">Page {{ archivedPage + 1 }} of {{ archivedTotalPages }}</span>
+            <button @click="nextArchivedPage" :disabled="archivedPage >= archivedTotalPages - 1" class="page-button">
+              Next <span>&rarr;</span>
+            </button>
+          </div>
           <span class="total-info">Total items: {{ totalArchivedItems }}</span>
         </div>
       </div>
@@ -201,9 +223,11 @@ export default {
     },
     currentPage: 0,
     pageSize: 5,
+    pageSizeOptions: [5, 10, 15, 20, 25],
     totalItems: 0,
     totalPages: 0,
     archivedPage: 0,
+    archivedPageSize: 5,
     archivedTotalPages: 0,
     totalArchivedItems: 0
   };
@@ -246,7 +270,7 @@ export default {
       const auth = localStorage.getItem('auth');
       if (!auth) return;
 
-      let url = `http://localhost:8080/api/expenses/archived?page=${this.archivedPage}&size=${this.pageSize}`;
+      let url = `http://localhost:8080/api/expenses/archived?page=${this.archivedPage}&size=${this.archivedPageSize}`;
 
       axios.get(url, {
         headers: { 'Authorization': `Basic ${auth}` }
@@ -258,6 +282,16 @@ export default {
         this.totalArchivedItems = response.data.totalItems ?? 0;
       })
       .catch(error => console.error('Failed to load archived expenses', error));
+    },
+    
+    handlePageSizeChange() {
+      this.currentPage = 0;
+      this.fetchExpenses();
+    },
+    
+    handleArchivedPageSizeChange() {
+      this.archivedPage = 0;
+      this.fetchArchivedExpenses();
     },
 
     handleExpenseAdded() {
@@ -396,47 +430,101 @@ h2 {
 }
 
 /* Filters section */
-.filters-container {
+.filter-card {
+  padding: 1rem;
+}
+
+.filter-header {
+  margin-bottom: 0.75rem;
+}
+
+.filter-header h2 {
+  color: ;
+  border: none;
+  padding: 0 1.5rem;
+  font-size: default;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.compact-filters-container {
   background: rgba(15, 23, 42, 0.5);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.filters {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
+.compact-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
 }
 
-.filter-item {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  padding: 1rem;
+.compact-filter-item {
+  flex: 0 0 auto;
+  min-width: 120px;
   transition: all 0.2s ease;
 }
 
-.filter-item:hover {
-  border-color: rgba(79, 70, 229, 0.3);
-  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.1);
-}
-
-.input-label {
-  font-size: 0.9rem;
-  color: #cbd5e1;
-  margin-bottom: 0.6rem;
+.compact-label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 0.3rem;
   display: block;
   font-weight: 500;
 }
 
-.filter-actions {
+.compact-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: rgba(15, 23, 42, 0.7);
+  color: #fff;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  height: 36px;
+}
+
+.compact-input:focus {
+  border-color: #4f46e5;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.compact-filter-actions {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 0.5rem;
+  margin: 0 auto;
+}
+
+.compact-button {
+  padding: 0.5rem 0.75rem;
+  height: 36px;
+  font-size: 0.85rem;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.compact-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 768px) {
+  .compact-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .compact-filter-actions {
+    margin: 0.75rem auto 0;
+    justify-content: center;
+    width: 100%;
+  }
 }
 
 input[type="text"],
@@ -658,6 +746,46 @@ button:disabled {
   border-radius: 8px;
   background: rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  justify-content: center;
+}
+
+.pagination-center {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.pagination .total-info {
+  margin-left: auto;
+  position: absolute;
+  right: 1rem;
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.page-size-select {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #fff;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.85rem;
+  height: 36px;
+  cursor: pointer;
+  min-width: 70px;
+}
+
+.page-size-select:focus {
+  border-color: #4f46e5;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
 }
 
 .page-button {
@@ -725,7 +853,7 @@ button:disabled {
   color: #94a3b8;
   border: none;
   padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  font-size: default;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -742,7 +870,7 @@ button:disabled {
 
 .tab-button.active::after {
   content: '';
-  position: absolute;
+  position: flex;
   bottom: -1px;
   left: 0;
   width: 100%;
@@ -753,6 +881,12 @@ button:disabled {
 
 .tab-content {
   animation: fadeIn 0.3s ease;
+}
+
+.page-size-control {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
 }
 
 @keyframes fadeIn {
