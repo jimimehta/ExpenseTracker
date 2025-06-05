@@ -1,0 +1,11 @@
+{
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-11",
+      "path": "C:/Program Files/Java/jdk-11",  // Change this if your JDK is in a different location
+      "default": true
+    }
+  ],
+  "java.jdt.ls.vmargs": "-javaagent:${workspaceFolder}/lombok.jar"
+}
