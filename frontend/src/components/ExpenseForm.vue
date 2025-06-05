@@ -6,19 +6,22 @@
           <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
       </div>
-      
+
       <div class="auth-header">
         <div class="logo-circle">
-          <svg xmlns="http://www.w3.org/2000/svg" class="add-icon" viewBox="0 0 20 20" fill="currentColor">
+          <svg v-if="!isEditMode" xmlns="http://www.w3.org/2000/svg" class="add-icon" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
           </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="add-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
         </div>
-        <h2>Add New Expense</h2>
+        <h2>{{ formTitle }}</h2>
         <p class="subtitle">Enter the details of your expense below</p>
       </div>
 
       <div class="auth-form-container">
-        <form @submit.prevent="addExpense">
+        <form @submit.prevent="submitExpense">
           <div class="form-field">
             <label for="description" class="input-label">Description</label>
             <input 
@@ -83,10 +86,13 @@
 
           <div class="form-actions">
             <button type="submit" class="auth-button">
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
+              <svg v-if="!isEditMode" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
               </svg>
-              Add Expense
+              <svg v-else xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+              {{ isEditMode ? 'Update Expense' : 'Add Expense' }}
             </button>
           </div>
         </form>
@@ -122,6 +128,10 @@ export default {
     isVisible: {
       type: Boolean,
       default: false
+    },
+    expenseToEdit: {
+      type: Object,
+      default: null
     }
   },
   data() {
@@ -133,6 +143,26 @@ export default {
       errors: {},
       generalError: ''
     };
+  },
+  computed: {
+    isEditMode() {
+      return this.expenseToEdit !== null;
+    },
+    formTitle() {
+      return this.isEditMode ? 'Edit Expense' : 'Add New Expense';
+    }
+  },
+  watch: {
+    expenseToEdit(expense) {
+      if (expense) {
+        this.description = expense.description;
+        this.amount = expense.amount;
+        this.date = expense.date;
+        this.category = expense.category;
+      } else {
+        this.resetForm();
+      }
+    }
   },
   methods: {
     clearErrors() {
@@ -146,25 +176,49 @@ export default {
     closeModal() {
       this.$emit('close');
     },
-    addExpense() {
+    resetForm() {
+      this.description = '';
+      this.amount = 0;
+      this.date = '';
+      this.category = '';
+    },
+    submitExpense() {
       this.clearErrors();
       const auth = localStorage.getItem('auth');
-      axios.post('http://localhost:8080/api/expenses', {
+      const expenseData = {
         description: this.description,
         amount: this.amount,
         date: this.date,
         category: this.category
-      }, {
+      };
+
+      const config = {
         headers: { 'Authorization': `Basic ${auth}` }
-      })
-      .then(() => {
-        this.$emit('expense-added');
-        this.description = '';
-        this.amount = 0;
-        this.date = '';
-        this.category = '';
-        this.closeModal();
-      })
+      };
+
+      let request;
+      if (this.isEditMode) {
+        // Use PUT for updating
+        request = axios.put(
+          `http://localhost:8080/api/expenses/${this.expenseToEdit.id}`,
+          expenseData,
+          config
+        );
+      } else {
+        // Use POST for creating
+        request = axios.post(
+          'http://localhost:8080/api/expenses',
+          expenseData,
+          config
+        );
+      }
+
+      request
+        .then(() => {
+          this.$emit(this.isEditMode ? 'expense-updated' : 'expense-added');
+          this.resetForm();
+          this.closeModal();
+        })
       .catch(error => {
         if (error.response) {
           // This Handles validation errors
@@ -191,7 +245,7 @@ export default {
                   .filter(key => typeof errorObj[key] === 'string')
                   .map(key => errorObj[key])
                   .join(', ');
-                
+
                 if (errorMessage) {
                   this.generalError = errorMessage;
                 } else {
@@ -203,7 +257,7 @@ export default {
             } else {
               this.generalError = 'Error has occurred while saving the expense';
             }
-            
+
             // Log the full error response for debugging
             console.log('Error response:', error.response);
           }

@@ -77,11 +77,13 @@
       </button>
     </div>
     
-    <expense-form 
-      :is-visible="showExpenseForm" 
-      @close="showExpenseForm = false" 
-      @expense-added="handleExpenseAdded" 
-    />
+  <expense-form
+    :is-visible="showExpenseForm"
+    :expense-to-edit="expenseToEdit"
+    @close="closeExpenseForm"
+    @expense-added="handleExpenseAdded"
+    @expense-updated="handleExpenseUpdated"
+  />
     
     <div class="card">
       <div class="tab-navigation">
@@ -95,10 +97,10 @@
           @click="activeTab = 'archived'" 
           :class="['tab-button', { active: activeTab === 'archived' }]"
         >
-          <h3>Active Expenses</h3>
+          <h3>Archived Expenses</h3>
         </button>
       </div>
-      
+
       <!-- Active Expenses Tab -->
       <div v-if="activeTab === 'all'" class="tab-content">
         <div class="page-size-control">
@@ -117,7 +119,7 @@
             <div class="header-amount">Amount</div>
             <div class="header-actions">Actions</div>
           </div>
-          
+
           <div class="expense-table-body" v-if="expenses.length > 0">
             <div v-for="expense in expenses" :key="expense.id" class="expense-row">
               <div class="cell-description" :title="expense.description">{{ expense.description }}</div>
@@ -127,6 +129,12 @@
               <div class="cell-date">{{ expense.date }}</div>
               <div class="cell-amount">${{ expense.amount }}</div>
               <div class="cell-actions">
+                <button @click="editExpense(expense)" class="edit-button">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                  Edit
+                </button>
                 <button @click="archiveExpense(expense.id)" class="archive-button">
                   <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
@@ -184,7 +192,7 @@
           </div>
           <div v-else class="empty-state">No archived expenses</div>
         </div>
-        
+
         <div class="pagination" v-if="archivedTotalPages > 0">
           <div class="pagination-center">
             <button @click="prevArchivedPage" :disabled="archivedPage === 0" class="page-button">
@@ -214,6 +222,7 @@ export default {
     archivedExpenses: [],
     activeTab: 'all',
     showExpenseForm: false,
+    expenseToEdit: null,
     filters: {
       category: '',
       startDate: '',
@@ -283,20 +292,34 @@ export default {
       })
       .catch(error => console.error('Failed to load archived expenses', error));
     },
-    
+
     handlePageSizeChange() {
       this.currentPage = 0;
       this.fetchExpenses();
     },
-    
+
     handleArchivedPageSizeChange() {
       this.archivedPage = 0;
       this.fetchArchivedExpenses();
     },
 
+    closeExpenseForm() {
+      this.showExpenseForm = false;
+      this.expenseToEdit = null;
+    },
+
     handleExpenseAdded() {
       this.fetchExpenses();
       this.fetchArchivedExpenses();
+    },
+
+    handleExpenseUpdated() {
+      this.fetchExpenses();
+    },
+
+    editExpense(expense) {
+      this.expenseToEdit = expense;
+      this.showExpenseForm = true;
     },
 
     applyFilters() {
@@ -618,12 +641,38 @@ input[type="number"]::placeholder,
   background: rgba(239, 68, 68, 0.2);
 }
 
+.edit-button {
+  background: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  min-width: 80px;
+  margin-right: 0.5rem;
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+}
+
+.edit-button:hover {
+  background: rgba(79, 70, 229, 0.2);
+}
+
 .archive-button {
   background: rgba(255, 255, 255, 0.1);
   color: #cbd5e1;
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem;
   min-width: 100px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
 }
 
 .archive-button:hover {
