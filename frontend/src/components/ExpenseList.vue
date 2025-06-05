@@ -853,7 +853,7 @@ button:disabled {
   color: #94a3b8;
   border: none;
   padding: 0.75rem 1.5rem;
-  font-size: default;
+  font-size: 1.25rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
