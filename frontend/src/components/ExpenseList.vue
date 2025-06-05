@@ -1,7 +1,8 @@
 <template>
   <div>
-    <h2>Expenses</h2>
+    <h1>Expense Tracker</h1>
 
+    <h2>Filter Expenses</h2>
     <!-- Filter Controls -->
     <div class="filters">
       <div>
@@ -41,20 +42,38 @@
       <button @click="resetFilters">Reset</button>
     </div>
 
-    <expense-form @expense-added="fetchExpenses" />
-
-    <ul>
-      <li v-for="expense in expenses" :key="expense.id">
-        {{ expense.description }} - {{ expense.amount }} - {{ expense.date }} - {{ expense.category }}
-        <button @click="deleteExpense(expense.id)">Delete</button>
-      </li>
-    </ul>
+    <expense-form @expense-added="handleExpenseAdded" />
+    
+    <div class="all-expenses-section">
+      <h2>All Expenses</h2>
+      <ul>
+        <li v-for="expense in expenses" :key="expense.id">
+          {{ expense.description }} - {{ expense.amount }} - {{ expense.date }} - {{ expense.category }}
+          <button @click="archiveExpense(expense.id)">Archive</button>
+        </li>
+      </ul>
+    </div>
 
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 0">Previous</button>
       <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
       <button @click="nextPage" :disabled="currentPage >= totalPages - 1">Next</button>
       <span>Total items: {{ totalItems }}</span>
+    </div>
+
+    <div class="archived-section">
+      <h2>Archived Expenses</h2>
+      <ul>
+        <li v-for="expense in archivedExpenses" :key="expense.id">
+          {{ expense.description }} - {{ expense.amount }} - {{ expense.date }} - {{ expense.category }}
+        </li>
+      </ul>
+      <div class="pagination">
+        <button @click="prevArchivedPage" :disabled="archivedPage === 0">Previous</button>
+        <span>Page {{ archivedPage + 1 }} of {{ archivedTotalPages }}</span>
+        <button @click="nextArchivedPage" :disabled="archivedPage >= archivedTotalPages - 1">Next</button>
+        <span>Total items: {{ totalArchivedItems }}</span>
+      </div>
     </div>
 
     <button @click="logout">Logout</button>
@@ -68,23 +87,29 @@ import ExpenseForm from './ExpenseForm.vue';
 export default {
   components: { ExpenseForm },
   data() {
-    return {
-      expenses: [],
-      filters: {
-        category: '',
-        startDate: '',
-        endDate: '',
-        minAmount: '',
-        maxAmount: ''
-      },
-      currentPage: 0,
-      pageSize: 25,
-      totalItems: 0,
-      totalPages: 0
-    };
-  },
+  return {
+    expenses: [],
+    archivedExpenses: [],
+    filters: {
+      category: '',
+      startDate: '',
+      endDate: '',
+      minAmount: '',
+      maxAmount: ''
+    },
+    currentPage: 0,
+    pageSize: 5,
+    totalItems: 0,
+    totalPages: 0,
+    archivedPage: 0,
+    archivedTotalPages: 0,
+    totalArchivedItems: 0
+  };
+},
+
   mounted() {
     this.fetchExpenses();
+    this.fetchArchivedExpenses();
   },
   methods: {
     fetchExpenses() {
@@ -113,6 +138,29 @@ export default {
         this.totalPages = response.data.totalPages;
       })
       .catch(() => this.$router.push('/'));
+    },
+
+    fetchArchivedExpenses() {
+      const auth = localStorage.getItem('auth');
+      if (!auth) return;
+
+      let url = `http://localhost:8080/api/expenses/archived?page=${this.archivedPage}&size=${this.pageSize}`;
+
+      axios.get(url, {
+        headers: { 'Authorization': `Basic ${auth}` }
+      })
+      .then(response => {
+        this.archivedExpenses = response.data.expenses || response.data.content || [];
+        this.archivedPage = response.data.currentPage ?? 0;
+        this.archivedTotalPages = response.data.totalPages ?? 1;
+        this.totalArchivedItems = response.data.totalItems ?? 0;
+      })
+      .catch(error => console.error('Failed to load archived expenses', error));
+    },
+
+    handleExpenseAdded() {
+      this.fetchExpenses();
+      this.fetchArchivedExpenses();
     },
 
     applyFilters() {
@@ -146,12 +194,29 @@ export default {
       }
     },
 
-    deleteExpense(id) {
+    prevArchivedPage() {
+      if (this.archivedPage > 0) {
+        this.archivedPage--;
+        this.fetchArchivedExpenses();
+      }
+    },
+
+    nextArchivedPage() {
+      if (this.archivedPage < this.archivedTotalPages - 1) {
+        this.archivedPage++;
+        this.fetchArchivedExpenses();
+      }
+    },
+
+    archiveExpense(id) {
       const auth = localStorage.getItem('auth');
       axios.delete(`http://localhost:8080/api/expenses/${id}`, {
         headers: { 'Authorization': `Basic ${auth}` }
       })
-      .then(() => this.fetchExpenses())
+      .then(() => {
+        this.fetchExpenses();
+        this.fetchArchivedExpenses();
+      })
       .catch(error => console.error(error));
     },
 
@@ -162,4 +227,3 @@ export default {
   }
 };
 </script>
-

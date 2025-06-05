@@ -2,7 +2,9 @@ package com.example.expensetracker.controller;
 
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.service.ExpenseService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
@@ -11,23 +13,38 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-
-import java.util;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:8081")
 @RestController
 @RequestMapping("/api/expenses")
+@RequiredArgsConstructor
 public class ExpenseController {
-    @Autowired
-    private ExpenseService expenseService;
 
+    private final ExpenseService expenseService;
+
+    @Deprecated
     @GetMapping
     public List<Expense> getAllExpenses() {
         return expenseService.getAllExpenses(Pageable.unpaged()).getContent();
+    }
+
+    @GetMapping("/archived")
+    public ResponseEntity<Map<String, Object>> getArchivedExpenses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<Expense> archivedPage = expenseService.getArchivedExpenses(PageRequest.of(page, size));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("expenses", archivedPage.getContent());
+        response.put("currentPage", archivedPage.getNumber());
+        response.put("totalItems", archivedPage.getTotalElements());
+        response.put("totalPages", archivedPage.getTotalPages());
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -71,18 +88,5 @@ public class ExpenseController {
         response.put("totalPages", expensePage.getTotalPages());
 
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/category")
-    public ResponseEntity<Page<Expense>> getExpensesByCategory(
-            @RequestParam Optional<String> category,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Expense> expenses = expenseService.getExpensesWithFilters(
-                category.orElse(null), null, null, null, null, page, size);
-
-        return ResponseEntity.ok(expenses);
     }
 }
