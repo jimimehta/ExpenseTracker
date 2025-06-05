@@ -29,6 +29,17 @@ public class ExpenseService {
         if(expense.getDate().isBefore(cutoffDate)) {
             expense.setDeleted(true);
         }
+        if (expense.getAmount() == null || expense.getAmount() <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than 0");
+        }
+
+        if (expense.getDate() == null) {
+            throw new NullPointerException("Date cannot be null");
+        }
+
+        if (expense.getDate().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Date cannot be in the future");
+        }
         return expenseRepository.save(expense);
     }
 

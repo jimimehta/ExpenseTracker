@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="form-container">
 
     <h2>Add Expense</h2>
 
     <form @submit.prevent="addExpense">
-
+      <div class="form-group">
       <input v-model="description" placeholder="Description" required @input="errors.description = ''" />
 
       <div v-if="errors.description" class="error-message">{{ errors.description }}</div>
@@ -32,7 +32,7 @@
       <div v-if="errors.category" class="error-message">{{ errors.category }}</div>
 
       <button type="submit">Add</button>
-
+      </div>
     </form>
 
     <!-- Error message display-->
@@ -106,7 +106,34 @@ export default {
 </script>
 
 <style scoped>
+.form-container {
+  max-width: 500px;
+  margin: auto;
+}
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+input, select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+button {
+  padding: 0.6rem 1.2rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #0056b3;
+}
 .error-message {
   color: #dc3545;
+  font-size: 0.9em;
+  margin-top: 0.25rem;
 }
 </style>
