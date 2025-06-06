@@ -42,12 +42,12 @@
 
           <div class="compact-filter-item">
             <label for="minAmount" class="compact-label">Min $</label>
-            <input type="number" id="minAmount" v-model="filters.minAmount" class="compact-input">
+            <input type="number" step="0.01" id="minAmount" v-model="filters.minAmount" class="compact-input">
           </div>
 
           <div class="compact-filter-item">
             <label for="maxAmount" class="compact-label">Max $</label>
-            <input type="number" id="maxAmount" v-model="filters.maxAmount" class="compact-input">
+            <input type="number" step="0.01" id="maxAmount" v-model="filters.maxAmount" class="compact-input">
           </div>
           
           <div class="compact-filter-actions">

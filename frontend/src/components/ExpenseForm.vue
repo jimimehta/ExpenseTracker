@@ -41,6 +41,7 @@
               id="amount"
               v-model="amount" 
               type="number" 
+              step="0.01" 
               placeholder="Enter amount" 
               required 
               @input="errors.amount = ''" 
