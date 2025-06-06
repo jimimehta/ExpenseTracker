@@ -2,31 +2,29 @@ package com.example.expensetracker.service;
 
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.repository.ExpenseRepository;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ExpenseService {
-    
-    private final ExpenseRepository expenseRepository;
 
+    private final ExpenseRepository expenseRepository;
 
     public Expense createExpense(Expense expense) {
         LocalDate cutoffDate = LocalDate.now().minusDays(30);
-        if(expense.getDate().isBefore(cutoffDate)) {
+        if (expense.getDate().isBefore(cutoffDate)) {
             expense.setDeleted(true);
         }
         if (expense.getAmount() == null || expense.getAmount() <= 0) {
@@ -45,7 +43,10 @@ public class ExpenseService {
 
     @Deprecated
     public Page<Expense> getAllExpenses(Pageable pageable) {
-        return expenseRepository.findAll(pageable);
+        List<Expense> sorted = sortByDateDescending(expenseRepository.findAll());
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), sorted.size());
+        return new PageImpl<>(sorted.subList(start, end), pageable, sorted.size());
     }
 
     public Optional<Expense> getExpenseById(Long id) {
@@ -83,19 +84,22 @@ public class ExpenseService {
             int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return expenseRepository.findWithFilters(
+        Page<Expense> pageResult = expenseRepository.findWithFilters(
                 category,
                 startDate,
                 endDate,
                 minAmount,
                 maxAmount,
                 pageable);
+
+        List<Expense> sorted = sortByDateDescending(pageResult.getContent());
+        return new PageImpl<>(sorted, pageable, pageResult.getTotalElements());
     }
 
     public Page<Expense> getArchivedExpenses(Pageable pageable) {
         log.info("Archived expenses triggered...");
         autoArchiveOldExpenses();
-        List<Expense> archived = expenseRepository.findByDeletedTrue();
+        List<Expense> archived = sortByDateDescending(expenseRepository.findByDeletedTrue());
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), archived.size());
         List<Expense> sublist = archived.subList(start, end);
@@ -113,5 +117,11 @@ public class ExpenseService {
         if (!outdatedExpenses.isEmpty()) {
             expenseRepository.saveAll(outdatedExpenses);
         }
+    }
+
+    private List<Expense> sortByDateDescending(List<Expense> expenses) {
+        return expenses.stream()
+                .sorted((e1, e2) -> e2.getDate().compareTo(e1.getDate()))
+                .collect(Collectors.toList());
     }
 }
