@@ -62,3 +62,194 @@ You will work on a pre-existing Expense Tracker application, which includes a ba
       - Walk through your code changes and explain your approach.
       - Discuss your testing strategy and improvement suggestion.
       - Answer questions about your decisions and any trade-offs.
+
+***
+
+# 💸 Expense Tracker Application
+
+A full-stack web application for tracking personal expenses with advanced filtering, validation, and archiving capabilities.
+
+## 🛠️ Tech Stack
+
+### 🔧 Backend
+
+- Java 11
+- Spring Boot 2.7
+- Spring Data JPA
+- Spring Security
+- H2 In-Memory Database
+- JUnit & Mockito for unit testing
+
+### 🖥️ Frontend
+
+- Vue.js 2.6
+- Vue Router
+- Axios (HTTP client)
+- Jest + Vue Test Utils for unit testing
+
+## ✅ Implemented Features
+
+### 🔹 Assigned Features
+
+#### 🧩 Exercise 1: Advanced Filtering and Pagination
+
+__Backend__
+
+- ✅ GET /api/expenses/filter endpoint created
+
+- ✅ Filtering by:
+
+  - Category
+  - Date range (startDate, endDate)
+  - Amount range (minAmount, maxAmount)
+
+- ✅ Pagination support with page and size params
+
+- ✅ Response includes:
+
+  - Paginated data
+  - Total pages
+  - Total items
+
+__Frontend__
+
+- ✅ UI controls for category, date, and amount filters
+
+- ✅ Pagination with:
+
+  - Next / Previous buttons
+  - Current page indicator
+  - Items per page selector
+
+#### 🧩 Exercise 2: Validation and Error Handling
+
+__Backend__
+
+- ✅ Validations:
+
+  - Amount must be greater than 0
+  - Date must not be in the future
+
+- ✅ 400 Bad Request with structured JSON errors
+
+- ✅ Global error handling via @ControllerAdvice
+
+__Frontend__
+
+- ✅ Displays validation messages inline
+- ✅ Highlights invalid fields
+- ✅ General error handling on form submission
+
+#### 🧩 Exercise 3: Soft Delete and Archiving
+
+__Backend__
+
+- ✅ DELETE /api/expenses/{id} performs soft delete using deleted flag
+- ✅ New endpoint: GET /api/expenses/archived
+- ✅ Auto-archive logic for expenses older than 30 days
+
+__Frontend__
+
+- ✅ "Delete" button changed to "Archive"
+- ✅ Tabbed UI to toggle Active / Archived
+- ✅ Separate pagination for archived data
+
+#### 🧩 Exercise 4: Comprehensive Tests
+
+__Backend__
+
+- ✅ Unit tested ExpenseService with Mockito
+- ✅ Integration tested ExpenseController with @SpringBootTest
+- ✅ Validated error scenarios for invalid inputs
+
+__Frontend__
+
+- ✅ Unit test for ExpenseForm.vue
+- ✅ Checked event emission on successful submission
+- ✅ Mocked API failures for error case testing
+
+### ✨ Additional Implemented Features
+
+#### 📝 Expense Editing Support
+
+- Unified form for Create & Edit
+- PUT API integration
+- Visual edit mode indicators
+
+#### 💲 Decimal Amount Support
+
+- Floating-point precision for financial inputs
+
+#### ✅ Expanded Testing Coverage
+
+- Tests for edge cases, archive logic, validation errors
+- JaCoCo code coverage enabled with HTML report at target/site/jacoco/index.html
+
+#### 🎨 Enhanced UI/UX
+
+- Responsive and modern UI
+- Modal forms with animations
+- Category badges, styled buttons, and error highlights
+
+#### 📊 Data Management Improvements
+
+- Default sort: Latest expenses first
+- Dual-layer validation (client + server)
+
+#### ⚡ Performance Optimizations
+
+- Server-side filtering using optimized JPQL
+- Efficient pagination logic
+
+#### 🧰 Development Tooling
+
+- Babel and Jest fixes for test compatibility
+- .vscode/settings.json for consistent formatting
+- Improved dev script reliability
+
+## 🧑‍💻 Development Environment
+
+### 🚀 Running the Application
+
+__Backend__
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+__Frontend__
+
+```bash
+cd frontend
+npm install
+npm run serve
+```
+
+### 🧪 Testing
+
+__Backend Tests__
+
+```bash
+cd backend
+mvn test
+```
+
+✅ Unit and integration tests with JUnit and Mockito
+
+__Frontend Tests__
+
+```bash
+cd frontend
+npm run test
+```
+
+✅ Component testing using Jest\
+✅ DOM and event handling tested with Vue Test Utils
+
+### 🔐 Default Login Credentials
+
+```javascript
+Username: admin
+Password: admin
+```
